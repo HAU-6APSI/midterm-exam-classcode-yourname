@@ -1,46 +1,42 @@
 // queries.js - reporting queries over the sightings database (Module 5).
 //
 // Each function returns rows. Some are finished; some are TODO. Run them all
-// and print the results with `npm run queries`.
+// and print the results with `npm run queries`. The exam flags are built from
+// the MEANING of your results, so any correct query earns the flag - you do
+// not have to match a particular style, order, or column list.
 import { pool } from './db.js'
 
-// Every sighting, oldest first. (Worked example.)
+// Every sighting, oldest id first. (Worked example - study this shape.)
 export async function allSightings() {
   const result = await pool.query('SELECT * FROM sightings ORDER BY id')
   return result.rows
 }
 
-// TODO 3: return only the sightings with MORE THAN 3 witnesses.
+// TODO 3: return only the sightings that have MORE THAN 3 witnesses.
+//         (Filter the rows with a condition on the witnesses column.)
 export async function bigSightings() {
-  // Hint: SELECT * FROM sightings WHERE witnesses > $1, with [3].
   return []
 }
 
-// TODO 4: return each sighting joined to WHERE it happened, as rows of
-//         { id, ghost_type, city }. Join sightings to locations on
-//         sightings.location_id = locations.id.
+// TODO 4: return each sighting together with the CITY it happened in.
+//         (The city lives in the locations table; connect the two tables on
+//         the sighting's location_id.)
 export async function withCity() {
-  // Hint: SELECT s.id, s.ghost_type, l.city
-  //       FROM sightings s JOIN locations l ON s.location_id = l.id
-  //       ORDER BY s.id;
   return []
 }
 
-// TODO 5: return how many sightings there are of each ghost_type, as rows of
-//         { ghost_type, count }, most common first.
+// TODO 5: return how many sightings there are of EACH ghost_type.
+//         (Group the rows by ghost_type and count each group.)
 export async function countByType() {
-  // Hint: SELECT ghost_type, COUNT(*) AS count FROM sightings
-  //       GROUP BY ghost_type ORDER BY count DESC;
   return []
 }
 
-// TODO 6: return the single MOST RECENT sighting (latest reported_at).
+// TODO 6: return the single MOST RECENT sighting (the latest reported_at).
 export async function latestSighting() {
-  // Hint: ORDER BY reported_at DESC LIMIT 1. Return result.rows[0].
   return null
 }
 
-// Runner: prints each result so you can read the answers.
+// Runner: prints each result so you can read your answers.
 if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('allSightings   ->', (await allSightings()).length, 'rows')
   console.log('bigSightings   ->', await bigSightings())
