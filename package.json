@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "smoke": "node smoke.js",
-    "queries": "node queries.js"
+    "queries": "node queries.js",
+    "flags": "node flags.js"
   },
   "dependencies": {
     "express": "^4.19.0",
