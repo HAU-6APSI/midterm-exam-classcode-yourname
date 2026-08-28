@@ -5,11 +5,16 @@
 // finish. Start it with `npm start`, open the dashboard, and make every panel
 // show correct numbers. `npm run report` prints the same values as text.
 import express from 'express'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { pool } from './db.js'
 
 export const app = express()
 app.use(express.json())
-app.use(express.static('public'))
+// Serve the dashboard from this file's own folder, so it works no matter which
+// directory you start the server from. (Infrastructure - not one of the bugs.)
+const publicDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'public')
+app.use(express.static(publicDir))
 
 // GET /api/sightings - every sighting. (Worked example - do not change.)
 app.get('/api/sightings', async (req, res) => {
