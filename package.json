@@ -5,9 +5,7 @@
   "description": "APSI midterm practical exam - HAUnted Sightings API and database. Solve the TODOs, run the app, then answer the Canvas quiz.",
   "scripts": {
     "start": "node app.js",
-    "smoke": "node smoke.js",
-    "queries": "node queries.js",
-    "flags": "node flags.js"
+    "report": "node report.js"
   },
   "dependencies": {
     "express": "^4.19.0",

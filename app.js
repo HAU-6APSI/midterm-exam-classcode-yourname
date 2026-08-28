@@ -1,46 +1,68 @@
-// app.js - the HAUnted Sightings REST API (Module 4).
+// app.js - the HAUnted Sightings app (Module 4 + Module 5).
 //
-// Some routes are finished as worked examples. Two are marked TODO: complete
-// them so the API behaves as described. Run the server with `npm start`, or
-// run `npm run smoke` to fire every API request at once and print the results.
+// This app MOSTLY works. It serves a dashboard at http://localhost:3000 that
+// reads from the API below. But there are a few BUGS to fix and two TODOs to
+// finish. Start it with `npm start`, open the dashboard, and make every panel
+// show correct numbers. `npm run report` prints the same values as text.
 import express from 'express'
 import { pool } from './db.js'
 
 export const app = express()
 app.use(express.json())
+app.use(express.static('public'))
 
-// A tiny logging middleware. It runs on every request, then calls next() to
-// hand control to the matching route. (Worked example - do not change.)
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`)
-  next()
-})
-
-// GET /sightings - list every sighting. (Worked example - study this shape.)
-app.get('/sightings', async (req, res) => {
+// GET /api/sightings - every sighting. (Worked example - do not change.)
+app.get('/api/sightings', async (req, res) => {
   const result = await pool.query('SELECT * FROM sightings ORDER BY id')
   res.json(result.rows)
 })
 
-// GET /sightings/:id - return ONE sighting, looked up by its id.
-// TODO 1: read the id from the route, fetch that one row with a parameterized
-//         query, and send it back. If no such row exists, respond with the
-//         "not found" status code instead. (Where does the id live on req?
-//         Which property of the query result holds the first row?)
-app.get('/sightings/:id', async (req, res) => {
-  res.status(501).json({ error: 'TODO 1 not done' })
+// GET /api/stats - the numbers the dashboard panels show.
+// This route runs, but THREE of its queries are wrong. Fix them so each panel
+// is correct.
+app.get('/api/stats', async (req, res) => {
+  const total = (await pool.query('SELECT COUNT(*)::int AS c FROM sightings')).rows[0].c
+
+  // BUG A: "most common ghost type" is coming out as the LEAST common one.
+  const mostType = (await pool.query(
+    'SELECT ghost_type, COUNT(*)::int AS c FROM sightings GROUP BY ghost_type ORDER BY c ASC'
+  )).rows[0].ghost_type
+
+  // BUG B: "high activity" should be sightings with MORE THAN 5 witnesses.
+  const highActivity = (await pool.query(
+    'SELECT COUNT(*)::int AS c FROM sightings WHERE witnesses >= 5'
+  )).rows[0].c
+
+  // BUG C: "busiest city" should group by CITY, but it groups by the location's
+  //        name, so each building is counted on its own.
+  const topCity = (await pool.query(
+    'SELECT l.name AS city, COUNT(*)::int AS c FROM sightings s JOIN locations l ON s.location_id = l.id GROUP BY l.name ORDER BY c DESC'
+  )).rows[0].city
+
+  res.json({ total, mostType, highActivity, topCity })
 })
 
-// POST /sightings - create a new sighting from the JSON body.
-// TODO 2: insert a row from the body's four fields (location_id, ghost_type,
-//         witnesses, reported_at) with a parameterized INSERT, then respond
-//         with the created row and the status code that means "created".
-//         (How do you get the new row back from an INSERT in one step?)
-app.post('/sightings', async (req, res) => {
+// GET /api/sightings/search?type=... - sightings of one ghost_type.
+// BUG D: it reads the wrong query-string field, so the filter never matches.
+app.get('/api/sightings/search', async (req, res) => {
+  const wanted = req.query.ghost   // the dashboard sends ?type=...
+  const result = await pool.query('SELECT * FROM sightings WHERE ghost_type = $1', [wanted])
+  res.json(result.rows)
+})
+
+// TODO 1: there is NO route to look up a single sighting by id, so the
+//         dashboard's "Look up a sighting" box is broken. Add
+//         GET /api/sightings/:id here. Return the one matching row, or respond
+//         with the "not found" status code if there is no such sighting.
+
+// POST /api/sightings - add a new sighting from the JSON body.
+// TODO 2: insert a row from the body (location_id, ghost_type, witnesses,
+//         reported_at) and respond with the created row and the "created"
+//         status code.
+app.post('/api/sightings', async (req, res) => {
   res.status(501).json({ error: 'TODO 2 not done' })
 })
 
-// Start listening only when run directly (not when imported by smoke/flags).
 if (import.meta.url === `file://${process.argv[1]}`) {
-  app.listen(3000, () => console.log('HAUnted Sightings API on http://localhost:3000'))
+  app.listen(3000, () => console.log('HAUnted Sightings on http://localhost:3000'))
 }
