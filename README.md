@@ -46,6 +46,19 @@ When every dashboard panel shows a sensible value and the look-up box works,
 you have fixed everything. Read your answers off the dashboard (or
 `npm run report`) and enter them in Canvas.
 
+## No laptop? Fix it in the browser
+
+You do not have to run anything locally. You can edit the files right on
+github.com (open a file, click the pencil, commit), and every push runs your app
+for you on GitHub. Open the run under the **Actions** tab and its **summary**
+shows two things: a self-check of whether each bug and TODO is fixed, and **your
+current answers to the 10 quiz questions**. It also saves a screenshot of your
+dashboard as the **dashboard-screenshot** artifact.
+
+This check does **not** grade you: your grade is the Canvas quiz. It only tells
+you how far you have got. Read your answers from the run summary (or, if you can
+run it, `npm run report`) and enter them in Canvas.
+
 ## The data
 
 Two tables: **locations** (8 haunted places across a few cities) and
